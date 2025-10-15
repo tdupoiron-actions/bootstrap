@@ -51,7 +51,7 @@ jobs:
       # Create repository
       - name: Create Repository
         id: create-repo
-        uses: tdupoiron-actions/create-repo-action@v1
+        uses: tdupoiron-actions/create-repo-action@v1.0.0
         with:
           repo_owner: ${{ github.repository_owner }}
           repo_name: ${{ needs.extract_repository_settings.outputs.repository_name }}
