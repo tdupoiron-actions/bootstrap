@@ -49,31 +49,24 @@ jobs:
     steps:
 
       # Create repository
-      - name: Create repository
-        id: create_repository
-        uses: actions/github-script@v6.3.3
+      - name: Create Repository
+        id: create-repo
+        uses: tdupoiron-actions/create-repo-action@v1
         with:
-          github-token: ${{ secrets.REPO_OPS_TOKEN }}
-          script: |
-            github.rest.repos.createInOrg({
-              org: context.repo.owner,
-              name: '${{ needs.extract_repository_settings.outputs.repository_name }}',
-              visibility: '${{ needs.extract_repository_settings.outputs.repository_visibility }}',
-            }).then(({ data }) => {
-                core.setOutput("repo_full_name", data.full_name);
-                core.setOutput("repo_url", data.html_url);
-                core.setOutput("repo_id", data.id);
-                core.setOutput("status", "success");
-            }
-            ).catch((error) => {
-                core.setOutput("status", "failure");
-                core.setOutput("error", error.response.data.message);
-            }
-            );
+          repo_owner: ${{ github.repository_owner }}
+          repo_name: ${{ needs.extract_repository_settings.outputs.repository_name }}
+          repo_visibility: ${{ needs.extract_repository_settings.outputs.repository_visibility }}
+          token: ${{ secrets.REPO_OPS_TOKEN }}
+      
+      - name: Display Results
+        run: |
+          echo "Repository created: ${{ steps.create-repo.outputs.repository_url }}"
+          echo "Repository ID: ${{ steps.create-repo.outputs.repository_id }}"
+          echo "Full name: ${{ steps.create-repo.outputs.repository_full_name }}"
 
       # Add comment if repository was created
       - name: Add comment
-        if: contains(steps.create_repository.outputs.status, 'success')
+        if: steps.create-repo.outputs.repository_url != ''
         uses: actions/github-script@v6.3.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -82,12 +75,12 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "✅ Repository [${{ steps.create_repository.outputs.repo_full_name }}](${{ steps.create_repository.outputs.repo_url }}) created"
+              body: "✅ Repository [${{ steps.create-repo.outputs.repository_full_name }}](${{ steps.create-repo.outputs.repository_url }}) created"
             })
 
       # Close issue if repository was created
       - name: Close issue
-        if: contains(steps.create_repository.outputs.status, 'success')
+        if: steps.create-repo.outputs.repository_url != ''
         uses: actions/github-script@v6.3.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -101,7 +94,7 @@ jobs:
 
       # Add comment if repository was not created
       - name: Add comment
-        if: contains(steps.create_repository.outputs.status, 'failure')
+        if: steps.create-repo.outputs.repository_url == ''
         uses: actions/github-script@v6.3.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -110,5 +103,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "❌ Repository could not be created: ${{ steps.create_repository.outputs.error }}"
+              body: "❌ Repository could not be created. Please check the workflow logs for more details."
             })
