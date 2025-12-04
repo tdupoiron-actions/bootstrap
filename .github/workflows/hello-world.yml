@@ -17,3 +17,6 @@ jobs:
         uses: docker://alpine:3.18
         with:
           args: echo "Hello from Docker container!"
+
+      - name: Changed Files
+        uses: tj-actions/changed-files@v44      
