@@ -51,29 +51,16 @@ jobs:
       # Create repository
       - name: Create repository
         id: create_repository
-        uses: actions/github-script@v6.3.3
+        uses: tdupoiron-actions/create-repo-amds-action@v1.0.0
         with:
           github-token: ${{ secrets.REPO_OPS_TOKEN }}
-          script: |
-            github.rest.repos.createInOrg({
-              org: context.repo.owner,
-              name: '${{ needs.extract_repository_settings.outputs.repository_name }}',
-              visibility: '${{ needs.extract_repository_settings.outputs.repository_visibility }}',
-            }).then(({ data }) => {
-                core.setOutput("repo_full_name", data.full_name);
-                core.setOutput("repo_url", data.html_url);
-                core.setOutput("repo_id", data.id);
-                core.setOutput("status", "success");
-            }
-            ).catch((error) => {
-                core.setOutput("status", "failure");
-                core.setOutput("error", error.response.data.message);
-            }
-            );
+          org-name: ${{ github.repository_owner }}
+          repo-name: ${{ needs.extract_repository_settings.outputs.repository_name }}
+          repo-visibility: ${{ needs.extract_repository_settings.outputs.repository_visibility }}
 
       # Add comment if repository was created
       - name: Add comment
-        if: contains(steps.create_repository.outputs.status, 'success')
+        if: success()
         uses: actions/github-script@v6.3.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -82,12 +69,12 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "✅ Repository [${{ steps.create_repository.outputs.repo_full_name }}](${{ steps.create_repository.outputs.repo_url }}) created"
+              body: "✅ Repository created: ${{ steps.create_repository.outputs.repository-url }}"
             })
 
       # Close issue if repository was created
       - name: Close issue
-        if: contains(steps.create_repository.outputs.status, 'success')
+        if: success()
         uses: actions/github-script@v6.3.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -101,7 +88,7 @@ jobs:
 
       # Add comment if repository was not created
       - name: Add comment
-        if: contains(steps.create_repository.outputs.status, 'failure')
+        if: failure()
         uses: actions/github-script@v6.3.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -110,5 +97,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "❌ Repository could not be created: ${{ steps.create_repository.outputs.error }}"
+              body: "❌ Repository could not be created"
             })
