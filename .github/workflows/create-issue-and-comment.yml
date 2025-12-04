@@ -21,35 +21,38 @@ jobs:
         with:
           github-token: ${{ secrets.PAT_TOKEN }}
           repository: ${{ github.repository }}
-          title: '🎉 GitHub Universe Recap - Paris 2025'
+          title: '🤖 GitHub Actions Automation Demo'
           body: |
-            ## GitHub Universe Recap - Paris Edition
+            ## GitHub Actions Automation Demo
             
-            📅 **Date:** November 25, 2025
-            📍 **Location:** Paris, France
+            🚀 **Purpose:** Demonstrating GitHub Actions workflow automation capabilities
             
-            ### Event Highlights
+            ### What This Demo Shows
             
-            Join us for an exclusive recap of GitHub Universe 2025! This special event brings together developers, security professionals, and GitHub enthusiasts from across France and Europe.
+            This issue is part of a live demonstration showcasing the power and flexibility of GitHub Actions. Watch as this workflow automatically:
             
-            **What to expect:**
-            - 🚀 Latest GitHub innovations and product announcements
-            - 🔒 Advanced security features with GitHub Advanced Security
-            - 🤖 AI-powered development with GitHub Copilot
-            - 💡 Best practices from industry leaders
-            - 🌟 Networking with the French developer community
+            **Automated Actions:**
+            - ✅ Creates this issue programmatically
+            - 💬 Adds a comment to the issue
+            - 🔒 Closes the issue automatically
+            - 📊 Generates a workflow summary
             
-            ### Agenda
-            - **09:00** - Registration & Coffee
-            - **10:00** - Keynote: The Future of AI-Assisted Development
-            - **11:30** - Workshop: Secure Code Game Challenge
-            - **14:00** - GitHub Advanced Security Deep Dive
-            - **16:00** - Community Networking
+            ### Key GitHub Actions Features Demonstrated
             
-            Looking forward to seeing everyone there! 🇫��
+            - **Workflow Dispatch:** Manual triggering for on-demand automation
+            - **Custom Actions:** Using community and custom-built actions
+            - **GitHub Script:** Leveraging Octokit for GitHub API interactions
+            - **Permissions Management:** Fine-grained control over workflow capabilities
+            - **Step Outputs:** Passing data between workflow steps
+            
+            ### Technologies Used
+            - 🔧 GitHub Actions workflow syntax
+            - 📦 Custom action: `tdupoiron-actions/create-issue-action@v1.1.1`
+            - 💬 Community action: `peter-evans/create-or-update-comment@v4`
+            - 🐙 GitHub Script with Octokit REST API
             
             ---
-            _This issue was automatically created to track the GitHub Universe Recap Paris event._
+            _This issue was automatically created as part of a GitHub Actions automation demonstration._
       
       - name: Add Comment to Commit
         uses: peter-evans/create-or-update-comment@v4
@@ -58,16 +61,31 @@ jobs:
           repository: ${{ github.repository }}
           issue-number: ${{ steps.create-issue.outputs.issue-number }}
           body: |
-            🎯 **GitHub Universe Recap Paris - Automated Workflow**
+            🤖 **GitHub Actions Automation Demo - Step 2**
             
-            This commit is part of the GitHub Universe Recap event demonstration in Paris (November 25, 2025).
+            This comment demonstrates automated interaction with GitHub issues using Actions workflows.
             
-            ✨ Demonstrating GitHub Actions automation:
-            - ✅ Issue creation
-            - 💬 Commit commenting
-            - 🔒 Automated issue closure
+            ### What Just Happened? 
             
-            🇫🇷 Merci et à bientôt à Paris!
+            1. ✅ A workflow was triggered (manually via `workflow_dispatch`)
+            2.  📝 An issue was automatically created
+            3. 💬 This comment was added programmatically
+            4. 🔄 Next: The issue will be automatically closed
+            
+            ### Why This Matters
+            
+            GitHub Actions enables teams to:
+            - Automate repetitive tasks
+            - Streamline issue management
+            - Build custom CI/CD pipelines
+            - Integrate with GitHub's powerful API
+            - Create sophisticated automation workflows
+            
+            **Workflow Run:** ${{ github.run_id }}
+            **Commit SHA:** `${{ github.sha }}`
+            
+            ---
+            _Powered by GitHub Actions automation_ 🚀
       
       - name: Close Issue with Octokit
         uses: actions/github-script@v7
@@ -78,7 +96,7 @@ jobs:
             
             await github.rest.issues.update({
               owner: context.repo.owner,
-              repo: context.repo.repo,
+              repo: context.repo. repo,
               issue_number: issueNumber,
               state: 'closed',
               state_reason: 'completed'
@@ -88,11 +106,11 @@ jobs:
       
       - name: Summary
         run: |
-          echo "## 🎉 GitHub Universe Recap Paris 2025 - Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 🤖 GitHub Actions Automation Demo - Workflow Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "✅ **Issue Created:** #${{ steps.create-issue.outputs.issue-number }}" >> $GITHUB_STEP_SUMMARY
           echo "📝 **Issue URL:** ${{ steps.create-issue.outputs.issue-url }}" >> $GITHUB_STEP_SUMMARY
-          echo "💬 **Comment added to commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "💬 **Comment added to issue:** #${{ steps.create-issue. outputs.issue-number }}" >> $GITHUB_STEP_SUMMARY
           echo "🔒 **Issue Closed:** #${{ steps.create-issue.outputs.issue-number }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🇫🇷 **Event:** GitHub Universe Recap - Paris, November 25, 2025" >> $GITHUB_STEP_SUMMARY
+          echo "🚀 **Demo Complete:** GitHub Actions automation demonstrated successfully!" >> $GITHUB_STEP_SUMMARY
